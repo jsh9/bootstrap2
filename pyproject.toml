@@ -1,0 +1,57 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=67", "wheel"]
+
+[project]
+name = "bootstrap2"
+version = "0.1.0"
+dependencies = [
+  "matplotlib>=1.5.3",
+  "numpy>=1.11.1",
+  "pandas>=0.18.1",
+  "scipy>=0.19.1",
+]
+requires-python = ">=3.10"
+authors = [
+  {name = "jsh9", email = "25124332+jsh9@users.noreply.github.com"},
+]
+maintainers = [
+  {name = "jsh9", email = "25124332+jsh9@users.noreply.github.com"},
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python",
+  "Topic :: Scientific/Engineering :: Information Analysis",
+  "Topic :: Scientific/Engineering :: Mathematics",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
+description = "Implementations of the percentile based bootstrap"
+keywords = ["ab-testing", "bootstrap", "confidence-intervals", "statistics"]
+license = {file = "LICENSE"}
+readme = "README.md"
+
+[project.urls]
+Changelog = "https://github.com/jsh9/bootstrap2/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/jsh9/bootstrap2"
+Issues = "https://github.com/jsh9/bootstrap2/issues"
+Repository = "https://github.com/jsh9/bootstrap2.git"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools.packages.find]
+exclude = ["examples*", "tests*"]
+
+[tool.yamlfix]
+line_length = 79
+none_representation = "null"

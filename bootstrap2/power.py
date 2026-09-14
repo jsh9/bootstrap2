@@ -1,10 +1,13 @@
 # Copyright (c) 2016-present, Facebook, Inc.
-# All rights reserved.
+# Copyright (c) 2026 jsh9
 #
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree. An additional grant
-# of patent rights can be found in the PATENTS file in the same directory.
-'Functions that allow one to perform power analysis'
+# SPDX-License-Identifier: MIT
+#
+# Based on the original bootstrapped library (Facebook BSD-licensed).
+# See LICENSE for the MIT license and retained BSD attribution.
+# An additional grant of patent rights can be found in the PATENTS file.
+"Functions that allow one to perform power analysis"
+
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
@@ -15,29 +18,31 @@ import warnings as _warnings
 
 
 def _get_power_df(bootstrap_result_list):
-    '''Returns a dataframe with importat statistics for power analysis
+    """
+    Returns a dataframe with importat statistics for power analysis
 
-    Args:
-        bootstrap_result_list: list of BootstrapResults
+    Args: bootstrap_result_list: list of BootstrapResults
 
     Example:
 
-    results = []
-    # should really be 600 -> 1k
-    for i in range(100):
-        test = numpy.random.normal(loc=100, scale=100, size=500) * 1.05
-        ctrl = numpy.random.normal(loc=100, scale=10, size=500)
+    results = [] # should really be 600 -> 1k for i in range(100): test =
+    numpy.random.normal(loc=100, scale=100, size=500) * 1.05 ctrl =
+    numpy.random.normal(loc=100, scale=10, size=500)
 
         results.append(bootstrap.percent_difference(test, ctrl))
 
 
     power_df = bootstrap.get_power_df(results)
-    '''
+    """
     if len(bootstrap_result_list) < 3000:
-        _warnings.warn(('bootstrap_result_list has very few examples. '
-                        'A general heuristic is to have at least 3k values. '
-                        'The more examples the more confident you can be in '
-                        'the power'))
+        _warnings.warn(
+            (
+                'bootstrap_result_list has very few examples. '
+                'A general heuristic is to have at least 3k values. '
+                'The more examples the more confident you can be in '
+                'the power'
+            )
+        )
 
     df = _pd.DataFrame.from_dict([x.__dict__ for x in bootstrap_result_list])
 
@@ -47,8 +52,9 @@ def _get_power_df(bootstrap_result_list):
     is_sig = is_sig == df['lower_bound'].apply(_np.sign)
     df['is_significant'] = is_sig
 
-    df['test_result'] = df['upper_bound'].apply(_np.sign).astype(int) \
-            * df['is_significant'].apply(lambda x: 1 if x else 0)
+    df['test_result'] = df['upper_bound'].apply(_np.sign).astype(int) * df[
+        'is_significant'
+    ].apply(lambda x: 1 if x else 0)
 
     result_cols = [
         'negative_significant',
@@ -66,12 +72,11 @@ def _get_power_df(bootstrap_result_list):
 
 
 def power_stats(bootstrap_result_list):
-    '''Returns summary statistics about a power_df
-    Args:
-        power_df: get_power_df([BootstrapResult, ...])
-    Returns:
-        A dataframe with summary statistics about the power of the simulation.
-    '''
+    """
+    Returns summary statistics about a power_df Args: power_df:
+    get_power_df([BootstrapResult, ...]) Returns: A dataframe with summary
+    statistics about the power of the simulation.
+    """
     power_df = _get_power_df(bootstrap_result_list)
     pcnt_results = power_df.test_result.value_counts() * 100 / len(power_df)
 
@@ -87,28 +92,28 @@ def power_stats(bootstrap_result_list):
     return stats
 
 
-def plot_power(bootstrap_result_list, insignificant_color='blue',
-               significant_color='orange', trend_color='black',
-               zero_color='black'):
-    '''
-    Args:
-        power_df: get_power_df([BootstrapResult, ...])
+def plot_power(
+        bootstrap_result_list,
+        insignificant_color='blue',
+        significant_color='orange',
+        trend_color='black',
+        zero_color='black',
+):
+    """
+    Args: power_df: get_power_df([BootstrapResult, ...])
 
     Example:
 
-    results = []
-    # should really be 600 -> 1k
-    for i in range(100):
-        test = numpy.random.normal(loc=100, scale=100, size=500) * 1.05
-        ctrl = numpy.random.normal(loc=100, scale=10, size=500)
+    results = [] # should really be 600 -> 1k for i in range(100): test =
+    numpy.random.normal(loc=100, scale=100, size=500) * 1.05 ctrl =
+    numpy.random.normal(loc=100, scale=10, size=500)
 
         results.append(bootstrap.percent_difference(test, ctrl))
 
     power_df = bootstrap.get_power_df(results)
 
-    bootstrap.power_stats(power_df)
-    bootstrap.plot_power(power_df)
-    '''
+    bootstrap.power_stats(power_df) bootstrap.plot_power(power_df)
+    """
     import matplotlib.pyplot as plt
 
     power_df = _get_power_df(bootstrap_result_list)
