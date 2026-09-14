@@ -1,34 +1,44 @@
-# Contributing to bootstrapped
+# Contributing to bootstrap2
+
 We want to make contributing to this project as easy and transparent as
 possible.
 
-## Pull Requests
+<!--TOC-->
+
+______________________________________________________________________
+
+**Table of Contents**
+
+- [1. Pull Requests](#1-pull-requests)
+- [2. Issues](#2-issues)
+- [3. Coding Style](#3-coding-style)
+- [4. License](#4-license)
+
+______________________________________________________________________
+
+<!--TOC-->
+
+## 1. Pull Requests
+
 We actively welcome your pull requests.
 
-1. Fork the repo and create your branch from `master`.
+1. Fork the repo and create your branch from `main`.
 2. If you've added code that should be tested, add tests.
 3. If you've changed APIs, update the documentation.
-4. Ensure the test suite passes.
-5. Make sure your code lints.
-6. If you haven't already, complete the Contributor License Agreement ("CLA").
+4. Ensure the test suite passes (`tox` or `pytest`).
+5. Make sure your code is formatted (`pre-commit run -a`).
 
-## Contributor License Agreement ("CLA")
-In order to accept your pull request, we need you to submit a CLA. You only need
-to do this once to work on any of Facebook's open source projects.
+## 2. Issues
 
-Complete your CLA here: <https://code.facebook.com/cla>
-
-## Issues
 We use GitHub issues to track public bugs. Please ensure your description is
 clear and has sufficient instructions to be able to reproduce the issue.
 
-Facebook has a [bounty program](https://www.facebook.com/whitehat/) for the safe
-disclosure of security bugs. In those cases, please go through the process
-outlined on that page and do not file a public issue.
+## 3. Coding Style
 
-## Coding Style  
-Please use pylint with the default settings.
+Please use the project's pre-commit hooks (including `muff-format`) before
+opening a pull request.
 
-## License
-By contributing to bootstrapped, you agree that your contributions will be licensed
-under its BSD license.
+## 4. License
+
+By contributing to bootstrap2, you agree that your contributions will be
+licensed under its MIT license.

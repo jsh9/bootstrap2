@@ -1,10 +1,13 @@
 # Copyright (c) 2016-present, Facebook, Inc.
-# All rights reserved.
+# Copyright (c) 2026 jsh9
 #
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree. An additional grant
-# of patent rights can be found in the PATENTS file in the same directory.
-'''Various comparison functions for use in bootstrap a/b tests'''
+# SPDX-License-Identifier: MIT
+#
+# Based on the original bootstrapped library (Facebook BSD-licensed).
+# See LICENSE for the MIT license and retained BSD attribution.
+# An additional grant of patent rights can be found in the PATENTS file.
+"""Various comparison functions for use in bootstrap a/b tests"""
+
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import division
@@ -19,7 +22,7 @@ def difference(test_stat, ctrl_stat):
     Returns:
         test_stat - ctrl_stat
     """
-    return (test_stat - ctrl_stat)
+    return test_stat - ctrl_stat
 
 
 def percent_change(test_stat, ctrl_stat):
@@ -46,7 +49,7 @@ def ratio(test_stat, ctrl_stat):
 
 def percent_difference(test_stat, ctrl_stat):
     """Calculates ratio between test and control. Useful when your statistics
-        might be close to zero. Provides a symmetric result.
+    might be close to zero. Provides a symmetric result.
     Args:
         test_stat: numpy array of test statistics
         ctrl_stat: numpy array of control statistics
