@@ -188,7 +188,11 @@ def _permutation_distribution(
 
         test_results = []
         ctrl_results = []
-        for seed in _np.random.randint(0, 2**32 - 1, num_threads):
+        # dtype=int64: on Windows the default integer type is int32, and
+        # 2**32 - 1 overflows int32 ("high is out of bounds for int32").
+        for seed in _np.random.randint(
+            0, 2**32 - 1, num_threads, dtype=_np.int64
+        ):
             job_args = (
                 test_lists,
                 ctrl_lists,

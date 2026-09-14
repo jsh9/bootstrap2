@@ -308,7 +308,11 @@ def _bootstrap_distribution(
         iter_per_job = _np.ceil(num_iterations * 1.0 / num_threads)
 
         results = []
-        for seed in _np.random.randint(0, 2**32 - 1, num_threads):
+        # dtype=int64: on Windows the default integer type is int32, and
+        # 2**32 - 1 overflows int32 ("high is out of bounds for int32").
+        for seed in _np.random.randint(
+            0, 2**32 - 1, num_threads, dtype=_np.int64
+        ):
             r = pool.apply_async(
                 _bootstrap_sim,
                 (
