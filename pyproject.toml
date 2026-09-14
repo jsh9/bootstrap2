@@ -46,6 +46,14 @@ Homepage = "https://github.com/jsh9/bootstrap2"
 Issues = "https://github.com/jsh9/bootstrap2/issues"
 Repository = "https://github.com/jsh9/bootstrap2.git"
 
+[tool.format_docstring]
+docstring_style = "google"
+fix_rst_backticks = true
+include_arg_defaults = false
+include_arg_types = false
+include_return_and_yield_types = false
+line_length = 79
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 

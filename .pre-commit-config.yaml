@@ -71,10 +71,20 @@ repos:
     hooks:
       - id: format-docstring
         name: Format docstrings in .py files
-        args: [--line-length=79]
+        args:
+          - --line-length=79
+          - --docstring-style=google
+          - --include-arg-types=false
+          - --include-arg-defaults=false
+          - --include-return-and-yield-types=false
       - id: format-docstring-jupyter
         name: Format docstrings in .ipynb files
-        args: [--line-length=79]
+        args:
+          - --line-length=79
+          - --docstring-style=google
+          - --include-arg-types=false
+          - --include-arg-defaults=false
+          - --include-return-and-yield-types=false
         # IPython magics (e.g. %matplotlib) are not valid Python for AST parsing
         exclude: ^examples/advanced_bootstrap_features\.ipynb$
   - repo: https://github.com/jsh9/blank-line-after-blocks

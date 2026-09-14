@@ -18,16 +18,18 @@ import warnings as _warnings
 
 
 def _get_power_df(bootstrap_result_list):
-    """
-    Returns a dataframe with importat statistics for power analysis
+    """Returns a dataframe with importat statistics for power analysis
 
-    Args: bootstrap_result_list: list of BootstrapResults
+    Args:
+        bootstrap_result_list: list of BootstrapResults
 
-    Example:
+    Examples:
 
-    results = [] # should really be 600 -> 1k for i in range(100): test =
-    numpy.random.normal(loc=100, scale=100, size=500) * 1.05 ctrl =
-    numpy.random.normal(loc=100, scale=10, size=500)
+    results = []
+    # should really be 600 -> 1k
+    for i in range(100):
+        test = numpy.random.normal(loc=100, scale=100, size=500) * 1.05
+        ctrl = numpy.random.normal(loc=100, scale=10, size=500)
 
         results.append(bootstrap.percent_difference(test, ctrl))
 
@@ -72,10 +74,11 @@ def _get_power_df(bootstrap_result_list):
 
 
 def power_stats(bootstrap_result_list):
-    """
-    Returns summary statistics about a power_df Args: power_df:
-    get_power_df([BootstrapResult, ...]) Returns: A dataframe with summary
-    statistics about the power of the simulation.
+    """Returns summary statistics about a power_df
+    Args:
+        power_df: get_power_df([BootstrapResult, ...])
+    Returns:
+        A dataframe with summary statistics about the power of the simulation.
     """
     power_df = _get_power_df(bootstrap_result_list)
     pcnt_results = power_df.test_result.value_counts() * 100 / len(power_df)
@@ -100,19 +103,23 @@ def plot_power(
         zero_color='black',
 ):
     """
-    Args: power_df: get_power_df([BootstrapResult, ...])
+    Args:
+        power_df: get_power_df([BootstrapResult, ...])
 
-    Example:
+    Examples:
 
-    results = [] # should really be 600 -> 1k for i in range(100): test =
-    numpy.random.normal(loc=100, scale=100, size=500) * 1.05 ctrl =
-    numpy.random.normal(loc=100, scale=10, size=500)
+    results = []
+    # should really be 600 -> 1k
+    for i in range(100):
+        test = numpy.random.normal(loc=100, scale=100, size=500) * 1.05
+        ctrl = numpy.random.normal(loc=100, scale=10, size=500)
 
         results.append(bootstrap.percent_difference(test, ctrl))
 
     power_df = bootstrap.get_power_df(results)
 
-    bootstrap.power_stats(power_df) bootstrap.plot_power(power_df)
+    bootstrap.power_stats(power_df)
+    bootstrap.plot_power(power_df)
     """
     import matplotlib.pyplot as plt
 

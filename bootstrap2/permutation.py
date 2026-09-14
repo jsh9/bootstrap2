@@ -23,11 +23,12 @@ MAX_ARRAY_SIZE = 10000
 
 # Randomized permutation shuffle test
 def _get_permutation_result(permutation_dist, stat_val):
-    """
-    Get the permutation test result for a given distribution. Args:
-    permutation_distribution: numpy array of permutation shuffle results from
-    permutation_distribution() stat_val: The overall statistic that this method
-    is attempting to calculate error bars for.
+    """Get the permutation test result for a given distribution.
+    Args:
+        permutation_distribution: numpy array of permutation shuffle results
+            from permutation_distribution()
+        stat_val: The overall statistic that this method is attempting to
+            calculate error bars for.
     """
 
     denom = len(permutation_dist)
@@ -77,9 +78,8 @@ def _permutation_sim(
         iteration_batch_size,
         seed,
 ):
-    """
-    Returns simulated permutation distribution. See permutation() function for
-    arg descriptions.
+    """Returns simulated permutation distribution. See permutation() function
+    for arg descriptions.
     """
 
     if seed is not None:
@@ -129,30 +129,34 @@ def _permutation_distribution(
         iteration_batch_size,
         num_threads,
 ):
-    """
-    Returns the simulated permutation distribution. The idea is to sample the
-    same indexes in a permutation shuffle across all arrays passed into
+    """Returns the simulated permutation distribution. The idea is to sample
+    the same indexes in a permutation shuffle across all arrays passed into
     values_lists.
 
-        This is especially useful when you want to co-sample records in a
-        ratio. numerator[k].sum() / denominator[k].sum() and not numerator[ j
-        ].sum() / denominator[k].sum() Args: values_lists: list of numpy arrays
-        (or scipy.sparse.csr_matrix) each represents a set of values to
-        shuffle. All arrays in values_lists must be of the same length.
+    This is especially useful when you want to co-sample records in a ratio.
+    numerator[k].sum() / denominator[k].sum() and not numerator[ j ].sum() /
+    denominator[k].sum()
+    Args:
+        values_lists: list of numpy arrays (or scipy.sparse.csr_matrix) each
+            represents a set of values to shuffle. All arrays in values_lists
+            must be of the same length.
         stat_func_lists: statistic to shuffle for each element in values_lists.
         num_iterations: number of permutation shuffle iterations / resamples /
-        simulations to perform. iteration_batch_size: The permutation sample
-        can generate very large matrices. This argument limits the memory
-        footprint by batching permutation rounds. If unspecified the underlying
-        code will produce a matrix of len(values) x num_iterations. If
-        specified the code will produce sets of len(values) x
-        iteration_batch_size (one at a time) until num_iterations have been
-        simulated. Defaults to no batching. num_threads: The number of threads
-        to use. This speeds up calculation of the shuffle. Defaults to 1. If -1
-        is specified then multiprocessing.cpu_count() is used instead. exact:
-        True to run an exact permutation shuffle test. Returns: The set of
-        permutation shuffle samples where each stat_function is applied on the
-        shuffled values.
+            simulations to perform.
+        iteration_batch_size: The permutation sample can generate very large
+            matrices. This argument limits the memory footprint by batching
+            permutation rounds. If unspecified the underlying code will produce
+            a matrix of len(values) x num_iterations. If specified the code
+            will produce sets of len(values) x iteration_batch_size (one at a
+            time) until num_iterations have been simulated. Defaults to no
+            batching.
+        num_threads: The number of threads to use. This speeds up calculation
+            of the shuffle. Defaults to 1. If -1 is specified then
+            multiprocessing.cpu_count() is used instead.
+        exact: True to run an exact permutation shuffle test.
+    Returns:
+        The set of permutation shuffle samples where each stat_function is
+        applied on the shuffled values.
     """
     _validate_arrays(test_lists)
     _validate_arrays(ctrl_lists)
@@ -217,37 +221,42 @@ def permutation_test(
         num_threads=1,
         return_distribution=False,
 ):
-    """
-    Returns bootstrap confidence intervals for an A/B test. Args: test: numpy
-    array (or scipy.sparse.csr_matrix) of test results ctrl: numpy array (or
-    scipy.sparse.csr_matrix) of ctrl results stat_func: statistic to bootstrap.
-    We provide several default functions:
-                * stat_functions.mean
-                * stat_functions.sum
-                * stat_functions.std
+    """Returns bootstrap confidence intervals for an A/B test.
+    Args:
+        test: numpy array (or scipy.sparse.csr_matrix) of test results
+        ctrl: numpy array (or scipy.sparse.csr_matrix) of ctrl results
+        stat_func: statistic to bootstrap. We provide several default
+            functions:
+            * stat_functions.mean
+            * stat_functions.sum
+            * stat_functions.std
         compare_func: Function to compare test and control against.
-                * compare_functions.difference
-                * compare_functions.percent_change
-                * compare_functions.ratio
-                * compare_functions.percent_difference
+            * compare_functions.difference
+            * compare_functions.percent_change
+            * compare_functions.ratio
+            * compare_functions.percent_difference
         test_denominator: optional array that does division after the statistic
-        is aggregated. This lets you compute group level division statistics.
-        One corresponding entry per record in test. Example: SUM(value) /
-        SUM(denom) instead of MEAN(value / denom) Ex. Cost Per Click cost per
-        click across a group  (clicks is denominator) SUM(revenue) /
-        SUM(clicks) mean cost per click for each record MEAN(revenue / clicks)
-        ctrl_denominator: see test_denominator. num_iterations: number of
-        bootstrap iterations to run. The higher this number the more sure you
-        can be about the stability your bootstrap. By this - we mean the
-        returned interval should be consistent across runs for the same input.
-        This also consumes more memory and makes analysis slower.
+            is aggregated. This lets you compute group level division
+            statistics. One corresponding entry per record in test. Example:
+            SUM(value) / SUM(denom) instead of MEAN(value / denom) Ex. Cost Per
+            Click cost per click across a group  (clicks is denominator)
+            SUM(revenue) / SUM(clicks) mean cost per click for each record
+            MEAN(revenue / clicks)
+        ctrl_denominator: see test_denominator.
+        num_iterations: number of bootstrap iterations to run. The higher this
+            number the more sure you can be about the stability your bootstrap.
+            By this - we mean the returned interval should be consistent across
+            runs for the same input. This also consumes more memory and makes
+            analysis slower.
         iteration_batch_size: The bootstrap sample can generate very large
-        arrays. This function iteration_batch_size limits the memory footprint
-        by batching bootstrap rounds. num_threads: The number of therads to
-        use. This speeds up calculation of the bootstrap. Defaults to 1. If -1
-        is specified then multiprocessing.cpu_count() is used instead. Returns:
+            arrays. This function iteration_batch_size limits the memory
+            footprint by batching bootstrap rounds.
+        num_threads: The number of therads to use. This speeds up calculation
+            of the bootstrap. Defaults to 1. If -1 is specified then
+            multiprocessing.cpu_count() is used instead.
+    Returns:
         percentage representing the percentage of permutation distribution
-        values that are more extreme than the original distribution.
+            values that are more extreme than the original distribution.
     """
     is_large_array = len(test) >= MAX_ARRAY_SIZE or len(ctrl) >= MAX_ARRAY_SIZE
     if is_large_array and num_iterations > MAX_ITER:
