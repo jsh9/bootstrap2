@@ -1,11 +1,12 @@
 # Copyright (c) 2016-present, Facebook, Inc.
+# All rights reserved.
 # Copyright (c) 2026 jsh9
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: BSD-3-Clause
 #
-# Based on the original bootstrapped library (Facebook BSD-licensed).
-# See LICENSE for the MIT license and retained BSD attribution.
-# An additional grant of patent rights can be found in the PATENTS file.
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
 """Functions that allow one to run a permutation shuffle test"""
 
 from __future__ import print_function
@@ -133,9 +134,14 @@ def _permutation_distribution(
     the same indexes in a permutation shuffle across all arrays passed into
     values_lists.
 
-    This is especially useful when you want to co-sample records in a ratio.
-    numerator[k].sum() / denominator[k].sum() and not numerator[ j ].sum() /
-    denominator[k].sum()
+    This is especially useful when you want to co-sample records in a ratio::
+
+        numerator[k].sum() / denominator[k].sum()
+
+    and not::
+
+        numerator[j].sum() / denominator[k].sum()
+
     Args:
         values_lists: list of numpy arrays (or scipy.sparse.csr_matrix) each
             represents a set of values to shuffle. All arrays in values_lists
@@ -241,11 +247,14 @@ def permutation_test(
             * compare_functions.percent_difference
         test_denominator: optional array that does division after the statistic
             is aggregated. This lets you compute group level division
-            statistics. One corresponding entry per record in test. Example:
-            SUM(value) / SUM(denom) instead of MEAN(value / denom) Ex. Cost Per
-            Click cost per click across a group  (clicks is denominator)
-            SUM(revenue) / SUM(clicks) mean cost per click for each record
-            MEAN(revenue / clicks)
+            statistics. One corresponding entry per record in test. Example::
+
+                SUM(value) / SUM(denom) instead of MEAN(value / denom)
+                Ex. Cost Per Click
+                cost per click across a group  (clicks is denominator)
+                    SUM(revenue) / SUM(clicks)
+                mean cost per click for each record
+                    MEAN(revenue / clicks)
         ctrl_denominator: see test_denominator.
         num_iterations: number of bootstrap iterations to run. The higher this
             number the more sure you can be about the stability your bootstrap.

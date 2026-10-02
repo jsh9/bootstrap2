@@ -1,11 +1,12 @@
 # Copyright (c) 2016-present, Facebook, Inc.
+# All rights reserved.
 # Copyright (c) 2026 jsh9
 #
-# SPDX-License-Identifier: MIT
+# SPDX-License-Identifier: BSD-3-Clause
 #
-# Based on the original bootstrapped library (Facebook BSD-licensed).
-# See LICENSE for the MIT license and retained BSD attribution.
-# An additional grant of patent rights can be found in the PATENTS file.
+# This source code is licensed under the BSD-style license found in the
+# LICENSE file in the root directory of this source tree. An additional grant
+# of patent rights can be found in the PATENTS file in the same directory.
 """Functions that allow one to create bootstrapped confidence intervals"""
 
 from __future__ import print_function
@@ -79,8 +80,9 @@ class BootstrapResults(object):
     def get_result(self):
         """
         Returns:
-            -1 if statistically significantly negative +1 if statistically
-            significantly positive 0 otherwise
+            * -1 if statistically significantly negative
+            * +1 if statistically significantly positive
+            * 0 otherwise
         """
         return int(self.is_significant()) * _np.sign(self.value)
 
@@ -257,8 +259,14 @@ def _bootstrap_distribution(
     values_lists.
 
     This is especially useful when you want to co-sample records in a ratio
-    metric. numerator[k].sum() / denominator[k].sum() and not numerator[ j
-    ].sum() / denominator[k].sum()
+    metric::
+
+        numerator[k].sum() / denominator[k].sum()
+
+    and not::
+
+        numerator[j].sum() / denominator[k].sum()
+
     Args:
         values_lists: list of numpy arrays (or scipy.sparse.csr_matrix) each
             represents a set of values to bootstrap. All arrays in values_lists
@@ -353,11 +361,16 @@ def bootstrap(
             * stat_functions.std
         denominator_values: optional array that does division after the
             statistic is aggregated. This lets you compute group level division
-            statistics. One corresponding entry per record in @values. Example:
-            SUM(value) / SUM(denom) instead of MEAN(value / denom)
+            statistics. One corresponding entry per record in @values.
+            Example::
 
-            Ex. Cost Per Click cost per click across a group SUM(revenue) /
-            SUM(clicks) mean cost per click for each MEAN(revenue / clicks)
+                SUM(value) / SUM(denom) instead of MEAN(value / denom)
+
+                Ex. Cost Per Click
+                cost per click across a group
+                    SUM(revenue) / SUM(clicks)
+                mean cost per click for each
+                    MEAN(revenue / clicks)
         alpha: alpha value representing the confidence interval. Defaults to
             0.05, i.e., 95th-CI.
         num_iterations: number of bootstrap iterations to run. The higher this
@@ -446,11 +459,14 @@ def bootstrap_ab(
             * compare_functions.percent_difference
         test_denominator: optional array that does division after the statistic
             is aggregated. This lets you compute group level division
-            statistics. One corresponding entry per record in test. Example:
-            SUM(value) / SUM(denom) instead of MEAN(value / denom) Ex. Cost Per
-            Click cost per click across a group  (clicks is denominator)
-            SUM(revenue) / SUM(clicks) mean cost per click for each record
-            MEAN(revenue / clicks)
+            statistics. One corresponding entry per record in test. Example::
+
+                SUM(value) / SUM(denom) instead of MEAN(value / denom)
+                Ex. Cost Per Click
+                cost per click across a group  (clicks is denominator)
+                    SUM(revenue) / SUM(clicks)
+                mean cost per click for each record
+                    MEAN(revenue / clicks)
         ctrl_denominator: see test_denominator.
         alpha: alpha value representing the confidence interval. Defaults to
             0.05, i.e., 95th-CI.

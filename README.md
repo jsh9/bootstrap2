@@ -71,10 +71,10 @@ population = np.random.normal(loc=mean, scale=stdev, size=50000)
 samples = population[:1000]
 
 print(bs.bootstrap(samples, stat_func=bs_stats.mean))
-# (99.46, 100.69)
+# Output: 99.55    (98.95, 100.16)
 
 print(bs.bootstrap(samples, stat_func=bs_stats.std))
-# (9.92, 10.36)
+# Output: 9.87    (9.45, 10.30)
 ```
 
 ### 4.1. Extended examples
@@ -123,7 +123,10 @@ Special thanks to Eytan Bakshy.
 
 ## 9. License
 
-**bootstrap2** is MIT-licensed. The original Facebook BSD license for
-`bootstrapped` is retained in [LICENSE-BSD](LICENSE-BSD) and cited in
-[LICENSE](LICENSE). An additional patent grant from the original project is in
-[PATENTS](PATENTS).
+**bootstrap2** is BSD-licensed (BSD-3-Clause), the same license as the original
+`bootstrapped` library; see [LICENSE](LICENSE). An additional patent grant from
+the original project is in [PATENTS](PATENTS).
+
+The example notebooks in [examples/](examples/) are derived from the original
+project's examples and remain under [LICENSE-examples](LICENSE-examples), which
+permits non-commercial testing and evaluation only.

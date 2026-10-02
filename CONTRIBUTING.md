@@ -41,4 +41,4 @@ opening a pull request.
 ## 4. License
 
 By contributing to bootstrap2, you agree that your contributions will be
-licensed under its MIT license.
+licensed under its BSD-3-Clause license.

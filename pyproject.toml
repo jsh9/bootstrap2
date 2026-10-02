@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = ["setuptools>=67", "wheel"]
+requires = ["setuptools>=77"]
 
 [project]
 name = "bootstrap2"
@@ -22,7 +22,6 @@ classifiers = [
   "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
-  "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3",
@@ -37,7 +36,8 @@ classifiers = [
 ]
 description = "Implementations of the percentile based bootstrap"
 keywords = ["ab-testing", "bootstrap", "confidence-intervals", "statistics"]
-license = {file = "LICENSE"}
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "PATENTS"]
 readme = "README.md"
 
 [project.urls]
