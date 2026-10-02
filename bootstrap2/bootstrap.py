@@ -64,11 +64,25 @@ class BootstrapResults(object):
         return self._apply(float(other), lambda x, other: x * other)
 
     def error_width(self):
-        """Returns: upper_bound - lower_bound"""
+        """
+        Return the width of the confidence interval.
+
+        Returns
+        -------
+        float
+            ``upper_bound - lower_bound``
+        """
         return self.upper_bound - self.lower_bound
 
     def error_fraction(self):
-        """Returns the error_width / value"""
+        """
+        Return the width of the confidence interval relative to the value.
+
+        Returns
+        -------
+        float
+            ``error_width() / value``, or ``numpy.inf`` if ``value`` is 0
+        """
         if self.value == 0:
             return _np.inf
         else:
@@ -79,24 +93,37 @@ class BootstrapResults(object):
 
     def get_result(self):
         """
-        Returns:
-            * -1 if statistically significantly negative
-            * +1 if statistically significantly positive
-            * 0 otherwise
+        Return the direction of a statistically significant result.
+
+        Returns
+        -------
+        float
+            -1 if statistically significantly negative, +1 if statistically
+            significantly positive, and 0 otherwise
         """
         return int(self.is_significant()) * _np.sign(self.value)
 
 
 def _get_confidence_interval(bootstrap_dist, stat_val, alpha, is_pivotal):
-    """Get the bootstrap confidence interval for a given distribution.
-    Args:
-        bootstrap_distribution: numpy array of bootstrap results from
-            bootstrap_distribution() or bootstrap_ab_distribution()
-        stat_val: The overall statistic that this method is attempting to
-            calculate error bars for.
-        alpha: The alpha value for the confidence intervals.
-        is_pivotal: if true, use the pivotal method. if false, use the
-            percentile method.
+    """
+    Get the bootstrap confidence interval for a given distribution.
+
+    Parameters
+    ----------
+    bootstrap_dist : numpy.ndarray
+        Bootstrap results, such as those from ``_bootstrap_distribution()``
+    stat_val : float
+        The overall statistic that this method is attempting to calculate error
+        bars for
+    alpha : float
+        The alpha value for the confidence interval
+    is_pivotal : bool
+        If True, use the pivotal method. If False, use the percentile method.
+
+    Returns
+    -------
+    BootstrapResults
+        The confidence interval and the estimated value
     """
     if is_pivotal:
         low = 2 * stat_val - _np.percentile(
@@ -222,8 +249,29 @@ def _bootstrap_sim(
         iteration_batch_size,
         seed,
 ):
-    """Returns simulated bootstrap distribution. See bootstrap() funciton for
-    arg descriptions.
+    """
+    Return a simulated bootstrap distribution.
+
+    Parameters
+    ----------
+    values_lists : list[numpy.ndarray] or list[csr_matrix]
+        The arrays to bootstrap. The same indices are resampled across all
+        arrays.
+    stat_func_lists : list[Callable]
+        The statistic to apply to each array in ``values_lists``
+    num_iterations : int
+        The number of bootstrap iterations to run
+    iteration_batch_size : int
+        The number of iterations to simulate at a time
+    seed : int or None
+        The seed for NumPy's global random number generator. If None, the
+        generator is not reseeded.
+
+    Returns
+    -------
+    numpy.ndarray
+        One row per array in ``values_lists`` and one column per bootstrap
+        iteration
     """
 
     if seed is not None:
@@ -254,12 +302,12 @@ def _bootstrap_distribution(
         iteration_batch_size,
         num_threads,
 ):
-    """Returns the simulated bootstrap distribution. The idea is to sample
-    the same indexes in a bootstrap re-sample across all arrays passed into
-    values_lists.
+    """
+    Return the simulated bootstrap distribution.
 
-    This is especially useful when you want to co-sample records in a ratio
-    metric::
+    The idea is to sample the same indices in a bootstrap resample across all
+    arrays passed into ``values_lists``. This is especially useful when you
+    want to co-sample records in a ratio metric::
 
         numerator[k].sum() / denominator[k].sum()
 
@@ -267,26 +315,30 @@ def _bootstrap_distribution(
 
         numerator[j].sum() / denominator[k].sum()
 
-    Args:
-        values_lists: list of numpy arrays (or scipy.sparse.csr_matrix) each
-            represents a set of values to bootstrap. All arrays in values_lists
-            must be of the same length.
-        stat_func_lists: statistic to bootstrap for each element in
-            values_lists.
-        num_iterations: number of bootstrap iterations / resamples /
-            simulations to perform.
-        iteration_batch_size: The bootstrap sample can generate very large
-            matrices. This argument limits the memory footprint by batching
-            bootstrap rounds. If unspecified the underlying code will produce a
-            matrix of len(values) x num_iterations. If specified the code will
-            produce sets of len(values) x iteration_batch_size (one at a time)
-            until num_iterations have been simulated. Defaults to no batching.
-        num_threads: The number of therads to use. This speeds up calculation
-            of the bootstrap. Defaults to 1. If -1 is specified then
-            multiprocessing.cpu_count() is used instead.
-    Returns:
-        The set of bootstrap resamples where each stat_function is applied on
-        the bootsrapped values.
+    Parameters
+    ----------
+    values_lists : list[numpy.ndarray] or list[csr_matrix]
+        Each element is a set of values to bootstrap. All arrays in
+        ``values_lists`` must have the same length.
+    stat_func_lists : list[Callable]
+        The statistic to bootstrap for each element in ``values_lists``
+    num_iterations : int
+        The number of bootstrap iterations (resamples) to perform
+    iteration_batch_size : int or None
+        The bootstrap can generate very large matrices. This argument limits
+        the memory footprint by batching bootstrap rounds: matrices of
+        ``len(values) x iteration_batch_size`` are produced one at a time until
+        ``num_iterations`` have been simulated. If None, a single matrix of
+        ``len(values) x num_iterations`` is produced.
+    num_threads : int
+        The number of processes to use. If -1, ``multiprocessing.cpu_count()``
+        is used.
+
+    Returns
+    -------
+    numpy.ndarray
+        The bootstrap distribution: one row per array in ``values_lists``,
+        where each row holds the statistic computed on every resample
     """
 
     _validate_arrays(values_lists)
@@ -351,47 +403,59 @@ def bootstrap(
         num_threads=1,
         return_distribution=False,
 ):
-    """Returns bootstrap estimate.
-    Args:
-        values: numpy array (or scipy.sparse.csr_matrix) of values to bootstrap
-        stat_func: statistic to bootstrap. We provide several default
-            functions:
-            * stat_functions.mean
-            * stat_functions.sum
-            * stat_functions.std
-        denominator_values: optional array that does division after the
-            statistic is aggregated. This lets you compute group level division
-            statistics. One corresponding entry per record in @values.
-            Example::
+    """
+    Return a bootstrap estimate and its confidence interval.
 
-                SUM(value) / SUM(denom) instead of MEAN(value / denom)
+    Parameters
+    ----------
+    values : numpy.ndarray or csr_matrix
+        The values to bootstrap, as a NumPy array or a
+        ``scipy.sparse.csr_matrix`` with 1 row
+    stat_func : Callable
+        The statistic to bootstrap. It receives a 2D array with one resample
+        per row and returns one value per row. Provided functions include
+        ``stat_functions.mean``, ``stat_functions.sum``, and
+        ``stat_functions.std``.
+    denominator_values : numpy.ndarray or csr_matrix or None, default=None
+        Optional array with one entry per record in ``values``. If given, the
+        statistic is computed on ``values`` and on ``denominator_values``
+        separately and then divided. This lets you compute group-level ratio
+        statistics. For example::
 
-                Ex. Cost Per Click
-                cost per click across a group
-                    SUM(revenue) / SUM(clicks)
-                mean cost per click for each
-                    MEAN(revenue / clicks)
-        alpha: alpha value representing the confidence interval. Defaults to
-            0.05, i.e., 95th-CI.
-        num_iterations: number of bootstrap iterations to run. The higher this
-            number the more sure you can be about the stability your bootstrap.
-            By this - we mean the returned interval should be consistent across
-            runs for the same input. This also consumes more memory and makes
-            analysis slower. Defaults to 10000.
-        iteration_batch_size: The bootstrap sample can generate very large
-            matrices. This argument limits the memory footprint by batching
-            bootstrap rounds. If unspecified the underlying code will produce a
-            matrix of len(values) x num_iterations. If specified the code will
-            produce sets of len(values) x iteration_batch_size (one at a time)
-            until num_iterations have been simulated. Defaults to 10. Passing
-            None will calculate the full simulation in one step.
-        is_pivotal: if true, use the pivotal method for bootstrapping
-            confidence intervals. If false, use the percentile method.
-        num_threads: The number of therads to use. This speeds up calculation
-            of the bootstrap. Defaults to 1. If -1 is specified then
-            multiprocessing.cpu_count() is used instead.
-    Returns:
-        BootstrapResults representing CI and estimated value.
+            SUM(value) / SUM(denom) instead of MEAN(value / denom)
+            Ex. Cost Per Click
+            cost per click across a group
+                SUM(revenue) / SUM(clicks)
+            mean cost per click for each record
+                MEAN(revenue / clicks)
+    alpha : float, default=0.05
+        The alpha value of the confidence interval. 0.05 gives a 95% confidence
+        interval.
+    num_iterations : int, default=10000
+        The number of bootstrap iterations to run. The higher this number, the
+        more stable the returned interval is across runs for the same input.
+        More iterations also use more memory and make the analysis slower.
+    iteration_batch_size : int or None, default=10
+        The bootstrap can generate very large matrices. This argument limits
+        the memory footprint by batching bootstrap rounds: matrices of
+        ``len(values) x iteration_batch_size`` are produced one at a time until
+        ``num_iterations`` have been simulated. If None, the full simulation is
+        calculated in one step.
+    is_pivotal : bool, default=True
+        If True, use the pivotal method for bootstrapping confidence intervals.
+        If False, use the percentile method.
+    num_threads : int, default=1
+        The number of processes to use to speed up the bootstrap. If -1,
+        ``multiprocessing.cpu_count()`` is used.
+    return_distribution : bool, default=False
+        If True, return the bootstrap distribution instead of the confidence
+        interval.
+
+    Returns
+    -------
+    BootstrapResults or numpy.ndarray
+        The confidence interval and estimated value, or the bootstrap
+        distribution if ``return_distribution`` is True
     """
     if denominator_values is None:
         values_lists = [values]
@@ -443,52 +507,76 @@ def bootstrap_ab(
         num_threads=1,
         return_distribution=False,
 ):
-    """Returns bootstrap confidence intervals for an A/B test.
-    Args:
-        test: numpy array (or scipy.sparse.csr_matrix) of test results
-        ctrl: numpy array (or scipy.sparse.csr_matrix) of ctrl results
-        stat_func: statistic to bootstrap. We provide several default
-            functions:
-            * stat_functions.mean
-            * stat_functions.sum
-            * stat_functions.std
-        compare_func: Function to compare test and control against.
-            * compare_functions.difference
-            * compare_functions.percent_change
-            * compare_functions.ratio
-            * compare_functions.percent_difference
-        test_denominator: optional array that does division after the statistic
-            is aggregated. This lets you compute group level division
-            statistics. One corresponding entry per record in test. Example::
+    """
+    Return bootstrap confidence intervals for an A/B test.
 
-                SUM(value) / SUM(denom) instead of MEAN(value / denom)
-                Ex. Cost Per Click
-                cost per click across a group  (clicks is denominator)
-                    SUM(revenue) / SUM(clicks)
-                mean cost per click for each record
-                    MEAN(revenue / clicks)
-        ctrl_denominator: see test_denominator.
-        alpha: alpha value representing the confidence interval. Defaults to
-            0.05, i.e., 95th-CI.
-        num_iterations: number of bootstrap iterations to run. The higher this
-            number the more sure you can be about the stability your bootstrap.
-            By this - we mean the returned interval should be consistent across
-            runs for the same input. This also consumes more memory and makes
-            analysis slower.
-        iteration_batch_size: The bootstrap sample can generate very large
-            arrays. This function iteration_batch_size limits the memory
-            footprint by batching bootstrap rounds. Defaults to 10. Passing
-            None will attempt to calculate the full simulation in one step.
-        scale_test_by: The ratio between test and control population sizes. Use
-            this if your test and control split is different from a 50/50
-            split. Defaults to 1.0.
-        is_pivotal: if true, use the pivotal method for bootstrapping
-            confidence intervals. If false, use the percentile method.
-        num_threads: The number of therads to use. This speeds up calculation
-            of the bootstrap. Defaults to 1. If -1 is specified then
-            multiprocessing.cpu_count() is used instead.
-    Returns:
-        BootstrapResults representing CI and estimated value.
+    Parameters
+    ----------
+    test : numpy.ndarray or csr_matrix
+        The test results, as a NumPy array or a ``scipy.sparse.csr_matrix``
+        with 1 row
+    ctrl : numpy.ndarray or csr_matrix
+        The control results, as a NumPy array or a ``scipy.sparse.csr_matrix``
+        with 1 row
+    stat_func : Callable
+        The statistic to bootstrap. It receives a 2D array with one resample
+        per row and returns one value per row. Provided functions include
+        ``stat_functions.mean``, ``stat_functions.sum``, and
+        ``stat_functions.std``.
+    compare_func : Callable
+        The function that compares the test statistic against the control
+        statistic. Provided functions include ``compare_functions.difference``,
+        ``compare_functions.percent_change``, ``compare_functions.ratio``, and
+        ``compare_functions.percent_difference``.
+    test_denominator : numpy.ndarray or csr_matrix or None, default=None
+        Optional array with one entry per record in ``test``. If given, the
+        statistic is computed on ``test`` and on ``test_denominator``
+        separately and then divided. This lets you compute group-level ratio
+        statistics. For example::
+
+            SUM(value) / SUM(denom) instead of MEAN(value / denom)
+            Ex. Cost Per Click
+            cost per click across a group  (clicks is denominator)
+                SUM(revenue) / SUM(clicks)
+            mean cost per click for each record
+                MEAN(revenue / clicks)
+    ctrl_denominator : numpy.ndarray or csr_matrix or None, default=None
+        Optional array with one entry per record in ``ctrl``. See
+        ``test_denominator``.
+    alpha : float, default=0.05
+        The alpha value of the confidence interval. 0.05 gives a 95% confidence
+        interval.
+    num_iterations : int, default=10000
+        The number of bootstrap iterations to run. The higher this number, the
+        more stable the returned interval is across runs for the same input.
+        More iterations also use more memory and make the analysis slower.
+    iteration_batch_size : int or None, default=10
+        The bootstrap can generate very large arrays. This argument limits the
+        memory footprint by batching bootstrap rounds. If None, the full
+        simulation is calculated in one step.
+    scale_test_by : float, default=1.0
+        The ratio between the test and control population sizes. Use this if
+        your test and control split is different from a 50/50 split.
+    is_pivotal : bool, default=True
+        If True, use the pivotal method for bootstrapping confidence intervals.
+        If False, use the percentile method.
+    num_threads : int, default=1
+        The number of processes to use to speed up the bootstrap. If -1,
+        ``multiprocessing.cpu_count()`` is used.
+    return_distribution : bool, default=False
+        If True, return the distribution of ``compare_func`` results instead of
+        the confidence interval.
+
+    Returns
+    -------
+    BootstrapResults or numpy.ndarray
+        The confidence interval and estimated value, or the bootstrap
+        distribution if ``return_distribution`` is True
+
+    Raises
+    ------
+    ValueError
+        If ``test`` or ``ctrl`` is None
     """
 
     both_denominators = (

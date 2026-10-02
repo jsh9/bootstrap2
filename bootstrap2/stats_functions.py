@@ -18,7 +18,22 @@ import scipy.sparse as _sparse
 
 
 def mean(values, axis=1):
-    """Returns the mean of each row of a matrix"""
+    """
+    Return the mean of each row of a matrix.
+
+    Parameters
+    ----------
+    values : numpy.ndarray or csr_matrix
+        A 2D array (or ``scipy.sparse.csr_matrix``) of values, where each row
+        is one bootstrap resample
+    axis : int, default=1
+        The axis along which to compute the mean
+
+    Returns
+    -------
+    numpy.ndarray
+        A 1D array with the mean of each row (when ``axis`` is 1)
+    """
     if isinstance(values, _sparse.csr_matrix):
         ret = values.mean(axis=axis)
         return ret.A1
@@ -27,7 +42,22 @@ def mean(values, axis=1):
 
 
 def sum(values, axis=1):
-    """Returns the sum of each row of a matrix"""
+    """
+    Return the sum of each row of a matrix.
+
+    Parameters
+    ----------
+    values : numpy.ndarray or csr_matrix
+        A 2D array (or ``scipy.sparse.csr_matrix``) of values, where each row
+        is one bootstrap resample
+    axis : int, default=1
+        The axis along which to compute the sum
+
+    Returns
+    -------
+    numpy.ndarray
+        A 1D array with the sum of each row (when ``axis`` is 1)
+    """
     if isinstance(values, _sparse.csr_matrix):
         ret = values.sum(axis=axis)
         return ret.A1
@@ -36,7 +66,22 @@ def sum(values, axis=1):
 
 
 def median(values, axis=1):
-    """Returns the sum of each row of a matrix"""
+    """
+    Return the median of each row of a matrix.
+
+    Parameters
+    ----------
+    values : numpy.ndarray
+        A 2D array of values, where each row is one bootstrap resample.
+        ``scipy.sparse.csr_matrix`` input is not supported.
+    axis : int, default=1
+        The axis along which to compute the median
+
+    Returns
+    -------
+    numpy.ndarray
+        A 1D array with the median of each row (when ``axis`` is 1)
+    """
     if isinstance(values, _sparse.csr_matrix):
         ret = values.median(axis=axis)
         return ret.A1
@@ -45,7 +90,22 @@ def median(values, axis=1):
 
 
 def std(values, axis=1):
-    """Returns the std of each row of a matrix"""
+    """
+    Return the standard deviation of each row of a matrix.
+
+    Parameters
+    ----------
+    values : numpy.ndarray
+        A 2D array of values, where each row is one bootstrap resample.
+        ``scipy.sparse.csr_matrix`` input is not supported.
+    axis : int, default=1
+        The axis along which to compute the standard deviation
+
+    Returns
+    -------
+    numpy.ndarray
+        A 1D array with the standard deviation of each row (when ``axis`` is 1)
+    """
     if isinstance(values, _sparse.csr_matrix):
         ret = values.std(axis=axis)
         return ret.A1

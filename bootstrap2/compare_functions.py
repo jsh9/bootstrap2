@@ -16,45 +16,79 @@ from __future__ import unicode_literals
 
 
 def difference(test_stat, ctrl_stat):
-    """Calculates difference change. A good default.
-    Args:
-        test_stat: numpy array of test statistics
-        ctrl_stat: numpy array of control statistics
-    Returns:
-        test_stat - ctrl_stat
+    """
+    Calculate the difference between test and control. A good default.
+
+    Parameters
+    ----------
+    test_stat : numpy.ndarray or float
+        The test statistics
+    ctrl_stat : numpy.ndarray or float
+        The control statistics
+
+    Returns
+    -------
+    numpy.ndarray or float
+        ``test_stat - ctrl_stat``
     """
     return test_stat - ctrl_stat
 
 
 def percent_change(test_stat, ctrl_stat):
-    """Calculates percent change.
-    Args:
-        test_stat: numpy array of test statistics
-        ctrl_stat: numpy array of control statistics
-    Returns:
-        (test_stat - ctrl_stat) / ctrl_stat * 100
+    """
+    Calculate the percent change from control to test.
+
+    Parameters
+    ----------
+    test_stat : numpy.ndarray or float
+        The test statistics
+    ctrl_stat : numpy.ndarray or float
+        The control statistics
+
+    Returns
+    -------
+    numpy.ndarray or float
+        ``(test_stat - ctrl_stat) * 100 / abs(ctrl_stat)``
     """
     return (test_stat - ctrl_stat) * 100.0 / abs(ctrl_stat)
 
 
 def ratio(test_stat, ctrl_stat):
-    """Calculates ratio between test and control
-    Args:
-        test_stat: numpy array of test statistics
-        ctrl_stat: numpy array of control statistics
-    Returns:
-        test_stat / ctrl_stat
+    """
+    Calculate the ratio between test and control.
+
+    Parameters
+    ----------
+    test_stat : numpy.ndarray or float
+        The test statistics
+    ctrl_stat : numpy.ndarray or float
+        The control statistics
+
+    Returns
+    -------
+    numpy.ndarray or float
+        ``test_stat / ctrl_stat``
     """
     return test_stat / ctrl_stat
 
 
 def percent_difference(test_stat, ctrl_stat):
-    """Calculates ratio between test and control. Useful when your statistics
-    might be close to zero. Provides a symmetric result.
-    Args:
-        test_stat: numpy array of test statistics
-        ctrl_stat: numpy array of control statistics
-    Returns:
-        (test_stat - ctrl_stat) / ((test_stat + ctrl_stat) / 2.0) * 100.0
+    """
+    Calculate the percent difference between test and control.
+
+    This is useful when your statistics might be close to zero. It provides a
+    symmetric result.
+
+    Parameters
+    ----------
+    test_stat : numpy.ndarray or float
+        The test statistics
+    ctrl_stat : numpy.ndarray or float
+        The control statistics
+
+    Returns
+    -------
+    numpy.ndarray or float
+        ``(test_stat - ctrl_stat) / ((test_stat + ctrl_stat) / 2.0) * 100.0``
     """
     return (test_stat - ctrl_stat) / ((test_stat + ctrl_stat) / 2.0) * 100.0
