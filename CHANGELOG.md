@@ -14,6 +14,8 @@
     `pyproject.toml`
   - Added modern project scaffolding: `tox.ini`, `.pre-commit-config.yaml`,
     GitHub Actions CI (Linux / macOS / Windows), and this changelog
+  - Added a GitHub Actions workflow that publishes to PyPI when a GitHub
+    release is published
   - Rewrote all docstrings in NumPy style, formatted by `format-docstring` and
     checked by `pydoclint` (new `pydoclint` tox env, run in CI)
 - Full diff
