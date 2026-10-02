@@ -36,7 +36,8 @@ clear and has sufficient instructions to be able to reproduce the issue.
 ## 3. Coding Style
 
 Please use the project's pre-commit hooks (including `muff-format`) before
-opening a pull request.
+opening a pull request. Docstrings use the NumPy style and are checked with
+`pydoclint` (`tox -e pydoclint`).
 
 ## 4. License
 

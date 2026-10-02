@@ -7,7 +7,7 @@
 # This source code is licensed under the BSD-style license found in the
 # LICENSE file in the root directory of this source tree. An additional grant
 # of patent rights can be found in the PATENTS file in the same directory.
-"Functions that allow one to perform power analysis"
+"""Functions that allow one to perform power analysis"""
 
 from __future__ import print_function
 from __future__ import absolute_import
@@ -19,23 +19,20 @@ import warnings as _warnings
 
 
 def _get_power_df(bootstrap_result_list):
-    """Returns a dataframe with importat statistics for power analysis
+    """
+    Return a dataframe with important statistics for power analysis.
 
-    Args:
-        bootstrap_result_list: list of BootstrapResults
+    Parameters
+    ----------
+    bootstrap_result_list : list[BootstrapResults]
+        Results of many simulated bootstrap A/B tests. At least 3,000 results
+        are recommended.
 
-    Examples:
-
-    results = []
-    # should really be 600 -> 1k
-    for i in range(100):
-        test = numpy.random.normal(loc=100, scale=100, size=500) * 1.05
-        ctrl = numpy.random.normal(loc=100, scale=10, size=500)
-
-        results.append(bootstrap.percent_difference(test, ctrl))
-
-
-    power_df = bootstrap.get_power_df(results)
+    Returns
+    -------
+    pandas.DataFrame
+        One row per result, sorted by value, with significance and plotting
+        columns added
     """
     if len(bootstrap_result_list) < 3000:
         _warnings.warn(
@@ -75,11 +72,38 @@ def _get_power_df(bootstrap_result_list):
 
 
 def power_stats(bootstrap_result_list):
-    """Returns summary statistics about a power_df
-    Args:
-        power_df: get_power_df([BootstrapResult, ...])
-    Returns:
-        A dataframe with summary statistics about the power of the simulation.
+    """
+    Return summary statistics about the power of a simulation.
+
+    Parameters
+    ----------
+    bootstrap_result_list : list[BootstrapResults]
+        Results of many simulated bootstrap A/B tests. At least 3,000 results
+        are recommended.
+
+    Returns
+    -------
+    pandas.DataFrame
+        The percentage of results that are positive, negative, insignificant,
+        positive significant, and negative significant
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import bootstrap2.bootstrap as bs
+    >>> import bootstrap2.compare_functions as bs_compare
+    >>> import bootstrap2.power as bs_power
+    >>> import bootstrap2.stats_functions as bs_stats
+    >>> results = []
+    >>> for _ in range(3000):
+    ...     test = np.random.normal(loc=100, scale=100, size=500) * 1.05
+    ...     ctrl = np.random.normal(loc=100, scale=10, size=500)
+    ...     results.append(
+    ...         bs.bootstrap_ab(
+    ...             test, ctrl, bs_stats.mean, bs_compare.percent_change
+    ...         )
+    ...     )
+    >>> bs_power.power_stats(results)  # doctest: +SKIP
     """
     power_df = _get_power_df(bootstrap_result_list)
     pcnt_results = power_df.test_result.value_counts() * 100 / len(power_df)
@@ -104,23 +128,39 @@ def plot_power(
         zero_color='black',
 ):
     """
-    Args:
-        power_df: get_power_df([BootstrapResult, ...])
+    Plot the results of a power simulation with matplotlib.
 
-    Examples:
+    Parameters
+    ----------
+    bootstrap_result_list : list[BootstrapResults]
+        Results of many simulated bootstrap A/B tests. At least 3,000 results
+        are recommended.
+    insignificant_color : str, default='blue'
+        The color of the error bars of insignificant results
+    significant_color : str, default='orange'
+        The color of the error bars of significant results
+    trend_color : str, default='black'
+        The color of the line connecting the estimated values
+    zero_color : str, default='black'
+        The color of the horizontal line at zero
 
-    results = []
-    # should really be 600 -> 1k
-    for i in range(100):
-        test = numpy.random.normal(loc=100, scale=100, size=500) * 1.05
-        ctrl = numpy.random.normal(loc=100, scale=10, size=500)
-
-        results.append(bootstrap.percent_difference(test, ctrl))
-
-    power_df = bootstrap.get_power_df(results)
-
-    bootstrap.power_stats(power_df)
-    bootstrap.plot_power(power_df)
+    Examples
+    --------
+    >>> import numpy as np
+    >>> import bootstrap2.bootstrap as bs
+    >>> import bootstrap2.compare_functions as bs_compare
+    >>> import bootstrap2.power as bs_power
+    >>> import bootstrap2.stats_functions as bs_stats
+    >>> results = []
+    >>> for _ in range(3000):
+    ...     test = np.random.normal(loc=100, scale=100, size=500) * 1.05
+    ...     ctrl = np.random.normal(loc=100, scale=10, size=500)
+    ...     results.append(
+    ...         bs.bootstrap_ab(
+    ...             test, ctrl, bs_stats.mean, bs_compare.percent_change
+    ...         )
+    ...     )
+    >>> bs_power.plot_power(results)  # doctest: +SKIP
     """
     import matplotlib.pyplot as plt
 

@@ -14,5 +14,7 @@
     `pyproject.toml`
   - Added modern project scaffolding: `tox.ini`, `.pre-commit-config.yaml`,
     GitHub Actions CI (Linux / macOS / Windows), and this changelog
+  - Rewrote all docstrings in NumPy style, formatted by `format-docstring` and
+    checked by `pydoclint` (new `pydoclint` tox env, run in CI)
 - Full diff
   - https://github.com/jsh9/bootstrap2/compare/bd19cae...0.1.0

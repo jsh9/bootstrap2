@@ -24,12 +24,22 @@ MAX_ARRAY_SIZE = 10000
 
 # Randomized permutation shuffle test
 def _get_permutation_result(permutation_dist, stat_val):
-    """Get the permutation test result for a given distribution.
-    Args:
-        permutation_distribution: numpy array of permutation shuffle results
-            from permutation_distribution()
-        stat_val: The overall statistic that this method is attempting to
-            calculate error bars for.
+    """
+    Get the permutation test result for a given distribution.
+
+    Parameters
+    ----------
+    permutation_dist : numpy.ndarray
+        Permutation shuffle results, such as those from
+        ``_permutation_distribution()``
+    stat_val : float
+        The observed statistic to compare against the permutation distribution
+
+    Returns
+    -------
+    float
+        The two-sided p-value: the fraction of ``permutation_dist`` that is at
+        least as far from 0 as ``stat_val``
     """
 
     denom = len(permutation_dist)
@@ -79,8 +89,33 @@ def _permutation_sim(
         iteration_batch_size,
         seed,
 ):
-    """Returns simulated permutation distribution. See permutation() function
-    for arg descriptions.
+    """
+    Return simulated permutation distributions for test and control.
+
+    Parameters
+    ----------
+    test_lists : list[numpy.ndarray]
+        The test arrays to pool and shuffle
+    ctrl_lists : list[numpy.ndarray]
+        The control arrays to pool and shuffle
+    stat_func_lists : list[Callable]
+        The statistic to apply to each shuffled array
+    num_iterations : int
+        The number of permutation shuffles to run
+    iteration_batch_size : int
+        The number of shuffles to simulate at a time
+    seed : int or None
+        The seed for NumPy's global random number generator. If None, the
+        generator is not reseeded.
+
+    Returns
+    -------
+    test_results : numpy.ndarray
+        The statistic computed on the test part of each shuffle, with one row
+        per array in ``test_lists``
+    ctrl_results : numpy.ndarray
+        The statistic computed on the control part of each shuffle, with one
+        row per array in ``ctrl_lists``
     """
 
     if seed is not None:
@@ -130,11 +165,12 @@ def _permutation_distribution(
         iteration_batch_size,
         num_threads,
 ):
-    """Returns the simulated permutation distribution. The idea is to sample
-    the same indexes in a permutation shuffle across all arrays passed into
-    values_lists.
+    """
+    Return the simulated permutation distribution.
 
-    This is especially useful when you want to co-sample records in a ratio::
+    The idea is to use the same shuffled indices across all arrays passed into
+    ``test_lists`` and ``ctrl_lists``. This is especially useful when you want
+    to co-sample records in a ratio::
 
         numerator[k].sum() / denominator[k].sum()
 
@@ -142,27 +178,35 @@ def _permutation_distribution(
 
         numerator[j].sum() / denominator[k].sum()
 
-    Args:
-        values_lists: list of numpy arrays (or scipy.sparse.csr_matrix) each
-            represents a set of values to shuffle. All arrays in values_lists
-            must be of the same length.
-        stat_func_lists: statistic to shuffle for each element in values_lists.
-        num_iterations: number of permutation shuffle iterations / resamples /
-            simulations to perform.
-        iteration_batch_size: The permutation sample can generate very large
-            matrices. This argument limits the memory footprint by batching
-            permutation rounds. If unspecified the underlying code will produce
-            a matrix of len(values) x num_iterations. If specified the code
-            will produce sets of len(values) x iteration_batch_size (one at a
-            time) until num_iterations have been simulated. Defaults to no
-            batching.
-        num_threads: The number of threads to use. This speeds up calculation
-            of the shuffle. Defaults to 1. If -1 is specified then
-            multiprocessing.cpu_count() is used instead.
-        exact: True to run an exact permutation shuffle test.
-    Returns:
-        The set of permutation shuffle samples where each stat_function is
-        applied on the shuffled values.
+    Parameters
+    ----------
+    test_lists : list[numpy.ndarray]
+        Each element is a set of test values to shuffle. All arrays in
+        ``test_lists`` must have the same length.
+    ctrl_lists : list[numpy.ndarray]
+        Each element is a set of control values to shuffle. All arrays in
+        ``ctrl_lists`` must have the same length.
+    stat_func_lists : list[Callable]
+        The statistic to compute for each element in ``test_lists`` and
+        ``ctrl_lists``
+    num_iterations : int
+        The number of permutation shuffles to perform
+    iteration_batch_size : int or None
+        The permutation shuffle can generate very large matrices. This argument
+        limits the memory footprint by batching shuffle rounds: matrices of
+        ``len(values) x iteration_batch_size`` are produced one at a time until
+        ``num_iterations`` have been simulated. If None, a single matrix of
+        ``len(values) x num_iterations`` is produced.
+    num_threads : int
+        The number of processes to use. If -1, ``multiprocessing.cpu_count()``
+        is used.
+
+    Returns
+    -------
+    test_results : numpy.ndarray
+        The statistic computed on the test part of each shuffle
+    ctrl_results : numpy.ndarray
+        The statistic computed on the control part of each shuffle
     """
     _validate_arrays(test_lists)
     _validate_arrays(ctrl_lists)
@@ -231,45 +275,68 @@ def permutation_test(
         num_threads=1,
         return_distribution=False,
 ):
-    """Returns bootstrap confidence intervals for an A/B test.
-    Args:
-        test: numpy array (or scipy.sparse.csr_matrix) of test results
-        ctrl: numpy array (or scipy.sparse.csr_matrix) of ctrl results
-        stat_func: statistic to bootstrap. We provide several default
-            functions:
-            * stat_functions.mean
-            * stat_functions.sum
-            * stat_functions.std
-        compare_func: Function to compare test and control against.
-            * compare_functions.difference
-            * compare_functions.percent_change
-            * compare_functions.ratio
-            * compare_functions.percent_difference
-        test_denominator: optional array that does division after the statistic
-            is aggregated. This lets you compute group level division
-            statistics. One corresponding entry per record in test. Example::
+    """
+    Run a randomized permutation shuffle test for an A/B test.
 
-                SUM(value) / SUM(denom) instead of MEAN(value / denom)
-                Ex. Cost Per Click
-                cost per click across a group  (clicks is denominator)
-                    SUM(revenue) / SUM(clicks)
-                mean cost per click for each record
-                    MEAN(revenue / clicks)
-        ctrl_denominator: see test_denominator.
-        num_iterations: number of bootstrap iterations to run. The higher this
-            number the more sure you can be about the stability your bootstrap.
-            By this - we mean the returned interval should be consistent across
-            runs for the same input. This also consumes more memory and makes
-            analysis slower.
-        iteration_batch_size: The bootstrap sample can generate very large
-            arrays. This function iteration_batch_size limits the memory
-            footprint by batching bootstrap rounds.
-        num_threads: The number of therads to use. This speeds up calculation
-            of the bootstrap. Defaults to 1. If -1 is specified then
-            multiprocessing.cpu_count() is used instead.
-    Returns:
-        percentage representing the percentage of permutation distribution
-            values that are more extreme than the original distribution.
+    Parameters
+    ----------
+    test : numpy.ndarray
+        The test results
+    ctrl : numpy.ndarray
+        The control results
+    stat_func : Callable
+        The statistic to compute on each shuffle. It receives a 2D array with
+        one shuffle per row and returns one value per row. Provided functions
+        include ``stat_functions.mean``, ``stat_functions.sum``, and
+        ``stat_functions.std``.
+    compare_func : Callable
+        The function that compares the test statistic against the control
+        statistic. Provided functions include ``compare_functions.difference``,
+        ``compare_functions.percent_change``, ``compare_functions.ratio``, and
+        ``compare_functions.percent_difference``.
+    test_denominator : numpy.ndarray or None, default=None
+        Optional array with one entry per record in ``test``. If given, the
+        statistic is computed on ``test`` and on ``test_denominator``
+        separately and then divided. This lets you compute group-level ratio
+        statistics. For example::
+
+            SUM(value) / SUM(denom) instead of MEAN(value / denom)
+            Ex. Cost Per Click
+            cost per click across a group  (clicks is denominator)
+                SUM(revenue) / SUM(clicks)
+            mean cost per click for each record
+                MEAN(revenue / clicks)
+    ctrl_denominator : numpy.ndarray or None, default=None
+        Optional array with one entry per record in ``ctrl``. See
+        ``test_denominator``.
+    num_iterations : int, default=10000
+        The number of permutation shuffles to run. The higher this number, the
+        more stable the result is across runs for the same input. More
+        iterations also use more memory and make the analysis slower. If
+        ``test`` or ``ctrl`` has at least ``MAX_ARRAY_SIZE`` elements, this is
+        capped at ``MAX_ITER`` with a warning.
+    iteration_batch_size : int or None, default=None
+        The permutation shuffle can generate very large arrays. This argument
+        limits the memory footprint by batching shuffle rounds. If None, the
+        full simulation is calculated in one step.
+    num_threads : int, default=1
+        The number of processes to use to speed up the shuffle. If -1,
+        ``multiprocessing.cpu_count()`` is used.
+    return_distribution : bool, default=False
+        If True, return the distribution of ``compare_func`` results instead of
+        the p-value.
+
+    Returns
+    -------
+    float or numpy.ndarray
+        The fraction of permutation distribution values that are more extreme
+        than the observed value (a two-sided p-value), or the permutation
+        distribution if ``return_distribution`` is True
+
+    Raises
+    ------
+    ValueError
+        If ``test`` or ``ctrl`` is None
     """
     is_large_array = len(test) >= MAX_ARRAY_SIZE or len(ctrl) >= MAX_ARRAY_SIZE
     if is_large_array and num_iterations > MAX_ITER:
