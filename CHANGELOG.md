@@ -7,6 +7,8 @@
   - Migrated packaging from `setup.py` / `setup.cfg` to `pyproject.toml`
   - Limited supported Python versions to currently supported releases
     (3.10–3.13)
+  - Raised the minimum versions of `numpy`, `scipy`, `pandas`, and `matplotlib`
+    to the oldest releases that ship Python 3.10 wheels
   - Kept the original BSD-3-Clause license, adding a copyright line for the
     bootstrap2 maintainer, and declared it as an SPDX license expression in
     `pyproject.toml`
